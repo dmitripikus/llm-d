@@ -130,12 +130,11 @@ kubectl apply -n ${NAMESPACE} -f guides/${GUIDE_NAME}/model-cache-pvc.yaml
 
 The coordinator's `replace-media-urls` step routes through an in-cluster Squid proxy that caches origin images/video, eliminating redundant fetches across requests.
 
-```bash
-kubectl apply -n ${NAMESPACE} -k guides/${GUIDE_NAME}/multimedia-downloader
-```
+To cache HTTPS origins, Squid must terminate TLS and re-sign responses with its own CA (SSL-Bump). A single script clones the `mm_service-guides` branch, deploys the SSL-Bump Squid (prebuilt image + generated CA secret), applies the coordinator CA patch, and restarts the coordinator:
 
-> [!NOTE]
-> HTTP origins are cached; HTTPS origins are tunneled via `CONNECT` and not cached. For HTTPS caching, an SSL-Bump variant exists upstream but requires a custom CA secret and a locally-built image.
+```bash
+./multimedia-downloader/setup-ssl-bump.sh
+```
 
 ### 4. Deploy the Model Servers
 

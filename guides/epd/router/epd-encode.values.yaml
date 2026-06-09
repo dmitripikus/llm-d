@@ -23,11 +23,15 @@ router:
         apiVersion: llm-d.ai/v1alpha1
         kind: EndpointPickerConfig
         plugins:
+        - type: vllmhttp-parser
         - type: queue-scorer
         schedulingProfiles:
         - name: default
           plugins:
           - pluginRef: queue-scorer
+        requestHandler:
+          parser:
+            pluginRef: vllmhttp-parser
 
   modelServers:
     matchLabels:

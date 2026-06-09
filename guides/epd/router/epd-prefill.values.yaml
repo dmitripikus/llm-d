@@ -23,6 +23,7 @@ router:
         apiVersion: llm-d.ai/v1alpha1
         kind: EndpointPickerConfig
         plugins:
+        - type: vllmhttp-parser
         - type: queue-scorer
         - type: kv-cache-utilization-scorer
         - type: prefix-cache-scorer
@@ -35,6 +36,9 @@ router:
             weight: 2
           - pluginRef: prefix-cache-scorer
             weight: 3
+        requestHandler:
+          parser:
+            pluginRef: vllmhttp-parser
 
   modelServers:
     matchLabels:

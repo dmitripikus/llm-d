@@ -16,7 +16,7 @@ router:
     image:
       registry: ghcr.io/revit13
       repository: llm-d-router-endpoint-picker
-      tag: dev13
+      tag: dev-9-6
     pluginsConfigFile: "epd-plugins.yaml"
     pluginsCustomConfig:
       epd-plugins.yaml: |
@@ -37,8 +37,9 @@ router:
           - pluginRef: prefix-cache-scorer
             weight: 3
         requestHandler:
-          parser:
-            pluginRef: vllmhttp-parser
+          parsers:
+            - pluginRef: vllmhttp-parser
+            - pluginRef: openai-parser
 
   modelServers:
     matchLabels:

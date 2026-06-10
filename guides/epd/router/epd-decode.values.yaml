@@ -16,7 +16,7 @@ router:
     image:
       registry: ghcr.io/revit13
       repository: llm-d-router-endpoint-picker
-      tag: dev-9-6
+      tag: dev-451239f8c7c6498ae1f9723d5f1ee8058098de93
     pluginsConfigFile: "epd-plugins.yaml"
     pluginsCustomConfig:
       epd-plugins.yaml: |

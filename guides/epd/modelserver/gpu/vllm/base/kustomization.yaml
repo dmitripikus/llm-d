@@ -8,7 +8,7 @@ namePrefix: epd-nvidia-gpu-vllm-
 images:
   - name: REPLACE_MODEL_SERVER_IMAGE
     newName: ghcr.io/revit13/vllm-openai
-    newTag: nightly-b50646e5effd7cb5884cd96fdff4c53c18521198.omer3
+    newTag: nightly-b50646e5effd7cb5884cd96fdff4c53c18521198.omer4
 
 labels:
   - pairs:

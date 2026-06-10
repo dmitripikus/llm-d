@@ -192,22 +192,27 @@ kubectl apply -n ${NAMESPACE} -k guides/recipes/modelserver/components/monitorin
 
 ## Verification
 
-### 1. Get the IP of a Proxy
+### 1. Get the IP of the Entrypoint
 
-Each role has its own EPP service. Pick the role you want to send traffic to (`decode` is the typical entry point for completion requests):
+Clients always send requests to the **coordinator**, which orchestrates the `encode → prefill → decode` pipeline. The per-role EPPs are internal — the coordinator dispatches to them by setting the `EPP-Phase` header on its outbound calls.
 
 **Standalone Mode**
 
+Hit the coordinator's ClusterIP directly:
+
 ```bash
-export ROLE=decode # encode | prefill | decode
-export IP=$(kubectl get service ${GUIDE_NAME}-${ROLE}-epp -n ${NAMESPACE} -o jsonpath='{.spec.clusterIP}')
+export IP=$(kubectl get service llm-d-coordinator -n ${NAMESPACE} -o jsonpath='{.spec.clusterIP}')
+export PORT=8080
 ```
 
 <details>
 <summary> <b>Gateway Mode</b> </summary>
 
+The Gateway forwards client traffic (no `EPP-Phase` header) to the coordinator via the `coordinator` HTTPRoute deployed alongside the coordinator overlay. Per-phase routes still match coordinator-issued internal calls.
+
 ```bash
 export IP=$(kubectl get gateway llm-d-inference-gateway -n ${NAMESPACE} -o jsonpath='{.status.addresses[0].value}')
+export PORT=80
 ```
 
 </details>
@@ -220,6 +225,7 @@ export IP=$(kubectl get gateway llm-d-inference-gateway -n ${NAMESPACE} -o jsonp
 kubectl run curl-debug --rm -it \
     --image=cfmanteiga/alpine-bash-curl-jq \
     --env="IP=$IP" \
+    --env="PORT=$PORT" \
     --env="NAMESPACE=$NAMESPACE" \
     -- /bin/bash
 ```
@@ -227,7 +233,7 @@ kubectl run curl-debug --rm -it \
 **Send a completion request:**
 
 ```bash
-curl -X POST http://${IP}/v1/completions \
+curl -X POST http://${IP}:${PORT}/v1/completions \
     -H 'Content-Type: application/json' \
     -d '{
         "model": "Qwen/Qwen3-VL-2B-Instruct",

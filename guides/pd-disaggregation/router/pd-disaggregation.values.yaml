@@ -13,10 +13,12 @@ router:
         kind: EndpointPickerConfig
         plugins:
         - type: disagg-headers-handler
-        - type: always-disagg-pd-decider
+        - type: prefix-based-pd-decider
+          parameters:
+            nonCachedTokens: 300
         - type: disagg-profile-handler
           parameters:
-            deciderPluginName: always-disagg-pd-decider
+            deciderPluginName: prefix-based-pd-decider
         - type: prefill-filter
         - type: decode-filter
         - type: prefix-cache-scorer

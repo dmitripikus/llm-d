@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: prefill
 spec:
-  replicas: 1
+  replicas: 8
   template:
     metadata:
       annotations:
@@ -22,7 +22,7 @@ spec:
           - serve
           args:
           - --model
-          - Qwen/Qwen3-VL-2B-Instruct
+          - openai/gpt-oss-120b
           - --port
           - "8000"
           - --block-size
@@ -31,9 +31,8 @@ spec:
           - '{"kv_connector":"NixlConnector", "kv_role":"kv_both"}'
           - --ec-transfer-config
           - '{"ec_connector": "ECCPUConnector", "ec_role": "ec_consumer"}'
-          - --disable-uvicorn-access-log
-          - --max-model-len
-          - "32000"
+          - --no-disable-hybrid-kv-cache-manager
+          - --gpu-memory-utilization=0.9
           env:
           - name: VLLM_LOGGING_LEVEL
             value: DEBUG
@@ -64,13 +63,13 @@ spec:
               protocol: TCP
           resources:
             limits:
-              cpu: "4"
-              memory: 64Gi
+              cpu: "8"
+              memory: 16Gi
               nvidia.com/gpu: "1"
               rdma/roce_gdr: "1"
             requests:
-              cpu: "4"
-              memory: 64Gi
+              cpu: "8"
+              memory: 16Gi
               nvidia.com/gpu: "1"
               rdma/roce_gdr: "1"
           volumeMounts:

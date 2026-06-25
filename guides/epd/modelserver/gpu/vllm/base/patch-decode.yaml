@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: decode
 spec:
-  replicas: 1
+  replicas: 2
   template:
     metadata:
       annotations:
@@ -22,18 +22,17 @@ spec:
           - serve
           args:
           - --model
-          - Qwen/Qwen3-VL-2B-Instruct
+          - openai/gpt-oss-120b
           - --port
           - "8000"
           - --tensor-parallel-size
-          - "1"
+          - "4"
           - --block-size
           - "128"
           - --kv-transfer-config
           - '{"kv_connector":"NixlConnector", "kv_role":"kv_both"}'
-          - --disable-uvicorn-access-log
-          - --max-model-len
-          - "32000"
+          - --disable-access-log-for-endpoints=/health,/metrics,/v1/models
+          - --no-disable-hybrid-kv-cache-manager
           env:
           - name: VLLM_LOGGING_LEVEL
             value: DEBUG
@@ -45,7 +44,7 @@ spec:
           - name: DP_SIZE
             value: "1"
           - name: TP_SIZE
-            value: "1"
+            value: "4"
           - name: DP_SIZE_LOCAL
             value: "1"
           - name: HF_HOME
@@ -62,14 +61,14 @@ spec:
               protocol: TCP
           resources:
             limits:
-              cpu: "4"
+              cpu: "16"
               memory: 64Gi
-              nvidia.com/gpu: "1"
+              nvidia.com/gpu: "4"
               rdma/roce_gdr: "1"
             requests:
-              cpu: "4"
+              cpu: "16"
               memory: 64Gi
-              nvidia.com/gpu: "1"
+              nvidia.com/gpu: "4"
               rdma/roce_gdr: "1"
           volumeMounts:
             - mountPath: /dev/shm

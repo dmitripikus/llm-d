@@ -10,5 +10,5 @@ spec:
   resources:
     requests:
       storage: 250Gi
-  storageClassName: ibm-spectrum-scale-fileset
-  volumeMode: Filesystem  
+  volumeMode: Filesystem
+

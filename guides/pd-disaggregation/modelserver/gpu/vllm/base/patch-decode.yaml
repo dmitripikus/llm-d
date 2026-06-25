@@ -23,6 +23,8 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: status.podIP
+            - name: HF_HOME
+              value: /models
             # NOTE: vLLM 0.19.X and 0.20.X images ship both nixl-cu13 and nixl-cu12;
             # NIXL can pick the wrong UCX libraries. Uncomment UCX_MODULE_DIR only
             # if you are running a cu129 version of vLLM.
@@ -48,6 +50,8 @@ spec:
               name: vllm-config
             - mountPath: /.triton
               name: triton-cache
+            - mountPath: /models
+              name: model-cache
           startupProbe:
             initialDelaySeconds: 15
             periodSeconds: 30
@@ -72,3 +76,6 @@ spec:
           emptyDir: {}
         - name: triton-cache
           emptyDir: {}
+        - name: model-cache
+          persistentVolumeClaim:
+            claimName: model-cache

@@ -1,14 +1,14 @@
-# EPD (Encode / Prefill / Decode)
+# Coordinator EPD (Encode / Prefill / Decode)
 
 ## Overview
 
-This guide deploys an **Encode / Prefill / Decode (EPD)** topology for vLLM and SGLang model servers. Three independent llm-d Router instances are installed — one per role — each fronting its own InferencePool of a single model server replica.
+This guide deploys a **Coordinator Encode / Prefill / Decode (EPD)** topology for vLLM model servers. Three independent llm-d Router instances are installed — one per role — each fronting its own InferencePool of a single model server replica.
 
 The result:
 
 - **3 Endpoint Pickers (EPPs)** — one for `encode`, one for `prefill`, one for `decode`.
 - **3 InferencePools** — selecting model servers by `llm-d.ai/role`.
-- **1 vLLM (or SGLang) replica per pool** — three model servers in total.
+- **1 vLLM replica per pool** — three model servers in total.
 
 ## Default Configuration
 
@@ -70,8 +70,8 @@ This guide includes configurations for the following accelerators:
 >
 > - Step 1: drop `encode` from the `for ROLE in ...` loop (deploy only `prefill` and `decode` routers).
 > - Step 3: skip entirely — the multimedia downloader is only used by the encode/coordinator pipeline.
-> - Step 4: apply a PD-only modelserver overlay (encode modelserver not needed).
-> - Step 5: in the coordinator configuration, keep only the `conditional-decode`, `prefill`, and `decode` steps (drop `replace-media-urls`, `render`, and `encode`).
+> - Step 4: the encode model server deployment is not used and can be scaled down to 0 replicas.
+> - Step 5: after the coordinator is deployed, a `ConfigMap` (`llm-d-coordinator-config`) is created containing the pipeline steps. Edit it to keep only the `conditional-decode`, `prefill`, and `decode` steps (drop `replace-media-urls`, `render`, and `encode`), then restart the coordinator deployment.
 
 ### 1. Deploy the llm-d Routers (one per role)
 

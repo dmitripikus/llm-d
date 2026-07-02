@@ -14,7 +14,7 @@ The result:
 
 | Parameter          | Value                                                   |
 | ------------------ | ------------------------------------------------------- |
-| Model              | [Qwen/Qwen3-VL-2B-Instruct](https://huggingface.co/Qwen/Qwen3-VL-2B-Instruct) |
+| Model              | [openai/gpt-oss-120b](https://huggingface.co/openai/gpt-oss-120b) |
 | Roles              | encode, prefill, decode                                 |
 | Replicas per role  | 1                                                       |
 | Tensor Parallelism | 2                                                       |
@@ -28,14 +28,6 @@ This guide includes configurations for the following accelerators:
 | Backend             | Directory                  | Notes                                      |
 | ------------------- | -------------------------- | ------------------------------------------ |
 | NVIDIA GPU          | `modelserver/gpu/vllm/${INFRA_PROVIDER}/`    | Default configuration (`INFRA_PROVIDER` options: `base`, `gke`)                      |
-| NVIDIA GPU (SGLang) | `modelserver/gpu/sglang/${INFRA_PROVIDER}/`  | SGLang inference server (`INFRA_PROVIDER` options: `base`, `gke`)                    |
-| AMD GPU             | `modelserver/amd/vllm/`    | AMD GPU                                    |
-| AMD GPU (SGLang)    | `modelserver/amd/sglang`   | AMD GPU                                    |
-| Intel XPU           | `modelserver/xpu/vllm/`    | Intel Data Center GPU Max 1550+            |
-| Intel Gaudi (HPU)   | `modelserver/hpu/vllm/`    | Gaudi 1/2/3 with DRA support               |
-| Google TPU v6e      | `modelserver/tpu-v6/vllm/` | GKE TPU                                    |
-| Google TPU v7       | `modelserver/tpu-v7/vllm/` | GKE TPU                                    |
-| CPU                 | `modelserver/cpu/vllm/`    | Intel/AMD, 64 cores + 64GB RAM per replica |
 
 > [!NOTE]
 > Some hardware variants use reduced configurations (smaller models) to enable CI testing for compatibility and regression checks. These configurations are maintained by their respective hardware vendors and are not guaranteed as production-ready examples. Users deploying on non-default hardware should review and adjust the configurations for their environment.
@@ -72,6 +64,14 @@ This guide includes configurations for the following accelerators:
   ```
 
 ## Installation Instructions
+
+> [!NOTE]
+> The steps below deploy the full **EPD** topology. For a **PD-only** deployment (no `encode` role), skip the encode-specific parts:
+>
+> - Step 1: drop `encode` from the `for ROLE in ...` loop (deploy only `prefill` and `decode` routers).
+> - Step 3: skip entirely — the multimedia downloader is only used by the encode/coordinator pipeline.
+> - Step 4: apply a PD-only modelserver overlay (encode modelserver not needed).
+> - Step 5: in the coordinator configuration, keep only the `conditional-decode`, `prefill`, and `decode` steps (drop `replace-media-urls`, `render`, and `encode`).
 
 ### 1. Deploy the llm-d Routers (one per role)
 
@@ -126,7 +126,7 @@ kubectl apply -n ${NAMESPACE} -f guides/${GUIDE_NAME}/model-cache-pvc.yaml
 > [!NOTE]
 > The first model server pod to start will populate the cache via HuggingFace Hub; subsequent pods reuse it. HF Hub uses lock files to serialize concurrent downloads, but expect the first cold start to be longer than the others.
 
-### 3. Deploy the multimedia downloader (caching proxy)
+### 3. (Optional) Deploy the multimedia downloader (caching proxy)
 
 The coordinator's `replace-media-urls` step routes through an in-cluster Squid proxy that caches origin images/video, eliminating redundant fetches across requests.
 
@@ -236,7 +236,7 @@ kubectl run curl-debug --rm -it \
 curl -X POST http://${IP}:${PORT}/v1/completions \
     -H 'Content-Type: application/json' \
     -d '{
-        "model": "Qwen/Qwen3-VL-2B-Instruct",
+        "model": "openai/gpt-oss-120b",
         "prompt": "How are you today?"
     }' | jq
 ```

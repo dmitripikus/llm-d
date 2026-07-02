@@ -47,8 +47,8 @@ This guide includes configurations for the following accelerators:
   ```bash
     export GAIE_VERSION=v1.5.0
     export ROUTER_CHART_VERSION=v0
-    export GUIDE_NAME="epd"
-    export NAMESPACE=llm-d-epd
+    export GUIDE_NAME="coordinator-epd"
+    export NAMESPACE=llm-d-coordinator-epd
   ```
 
 - Install the Gateway API Inference Extension CRDs:
@@ -117,7 +117,7 @@ done
 The three model server pods and the coordinator share a single `PersistentVolumeClaim` (`llm-d-model-cache`) for the HuggingFace model files, so the model is downloaded once and reused. The claim is `ReadWriteMany` and 250Gi.
 
 > [!IMPORTANT]
-> The manifest pins `storageClassName: ibm-spectrum-scale-fileset`, which is specific to the environment this guide was authored on. **Edit `guides/epd/model-cache-pvc.yaml` to use an RWX-capable StorageClass available in your cluster** (e.g. NFS, CephFS, EFS, Azure Files, GCP Filestore) before applying. If your cluster's default StorageClass is RWX-capable, you can remove the `storageClassName` field entirely.
+> The manifest pins `storageClassName: ibm-spectrum-scale-fileset`, which is specific to the environment this guide was authored on. **Edit `guides/coordinator-epd/model-cache-pvc.yaml` to use an RWX-capable StorageClass available in your cluster** (e.g. NFS, CephFS, EFS, Azure Files, GCP Filestore) before applying. If your cluster's default StorageClass is RWX-capable, you can remove the `storageClassName` field entirely.
 
 ```bash
 kubectl apply -n ${NAMESPACE} -f guides/${GUIDE_NAME}/model-cache-pvc.yaml

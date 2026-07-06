@@ -17,8 +17,8 @@ data:
       timeout: 60s
 
     pipeline:
-      kv_connector: nixlv2
-      ec_connector: nixl
+      kv_connector: kv-nixl
+      ec_connector: ec-nixl
       steps:
         - type: replace-media-urls
           params:

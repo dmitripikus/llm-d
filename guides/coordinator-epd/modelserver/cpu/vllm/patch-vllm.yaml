@@ -20,7 +20,7 @@ spec:
             # - "--collect-detailed-traces=all"
           env:
             - name: VLLM_LOGGING_LEVEL
-              value: DEBUG
+              value: INFO
             - name: VLLM_CPU_KVCACHE_SPACE
               value: "32"
             - name: VLLM_CPU_NUM_OF_RESERVED_CPU

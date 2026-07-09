@@ -36,7 +36,7 @@ spec:
           - name: PORT
             value: "8000"
           - name: VLLM_LOGGING_LEVEL
-            value: DEBUG
+            value: INFO
           - name: VLLM_EC_SIDE_CHANNEL_HOST
             valueFrom:
               fieldRef:

@@ -17,7 +17,7 @@ spec:
       terminationGracePeriodSeconds: 30
       containers:
       - name: coordinator
-        image: ghcr.io/revit13/llm-d-coordinator:dev-876a3579ec6c1bc1b55468f61c1341c3247f2e61
+        image: ghcr.io/roytman/coordinator:dev
         imagePullPolicy: IfNotPresent
         args:
         - --config
@@ -29,13 +29,17 @@ spec:
           value: "http://multimedia-downloader:80"
         - name: NO_PROXY
           value: "localhost,127.0.0.1,.svc,.cluster.local"
+        - name: GOMAXPROCS
+          value: "4"
+        - name: GOMEMLIMIT
+          value: "7200MiB"    
         resources:
           requests:
-            cpu: "100m"
-            memory: 128Mi
+            cpu: "4"
+            memory: 8Gi
           limits:
-            cpu: "500m"
-            memory: 512Mi
+            cpu: "4"
+            memory: 8Gi
         ports:
         - name: http
           containerPort: 8080
